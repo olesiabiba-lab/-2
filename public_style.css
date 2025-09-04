@@ -1,0 +1,431 @@
+/* AI Костёр - Campfire App Styles */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+    color: #ffffff;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+/* Stars background animation */
+.stars {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+.star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: #ffffff;
+    border-radius: 50%;
+    animation: twinkle 3s infinite alternate;
+}
+
+@keyframes twinkle {
+    0% { opacity: 0.3; }
+    100% { opacity: 1; }
+}
+
+.container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Top message display */
+.message-display {
+    position: absolute;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    color: #ffaa00;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+    z-index: 10;
+    max-width: 90%;
+    transition: all 0.3s ease;
+}
+
+/* Campfire area */
+.campfire-area {
+    position: relative;
+    width: 600px;
+    height: 600px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Animated campfire */
+.campfire {
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle, #ff6b35 0%, #ff8e35 30%, #ffaa35 60%, #ff4500 100%);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    position: relative;
+    animation: fireFlicker 1.5s ease-in-out infinite alternate;
+    box-shadow: 0 0 50px #ff6b35, 0 0 100px #ff4500;
+}
+
+.campfire::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: 20px;
+    width: 80px;
+    height: 100px;
+    background: radial-gradient(ellipse, #ffaa00 0%, #ff6b35 40%, transparent 70%);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    animation: fireFlicker 1.2s ease-in-out infinite alternate-reverse;
+}
+
+.campfire::after {
+    content: '';
+    position: absolute;
+    top: -30px;
+    left: 35px;
+    width: 50px;
+    height: 80px;
+    background: radial-gradient(ellipse, #ffff00 0%, #ffaa00 50%, transparent 80%);
+    border-radius: 50% 50% 50% 50% / 70% 70% 30% 30%;
+    animation: fireFlicker 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes fireFlicker {
+    0% { transform: scale(1) rotate(-1deg); }
+    50% { transform: scale(1.05) rotate(0deg); }
+    100% { transform: scale(0.95) rotate(1deg); }
+}
+
+/* Wood logs under fire */
+.wood-logs {
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 140px;
+    height: 20px;
+}
+
+.log {
+    position: absolute;
+    width: 80px;
+    height: 12px;
+    background: linear-gradient(45deg, #8B4513, #A0522D);
+    border-radius: 6px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.log:nth-child(1) {
+    transform: rotate(25deg);
+    left: 10px;
+}
+
+.log:nth-child(2) {
+    transform: rotate(-25deg);
+    right: 10px;
+}
+
+.log:nth-child(3) {
+    transform: rotate(0deg);
+    left: 50%;
+    transform: translateX(-50%);
+    top: 8px;
+}
+
+/* User names around campfire */
+.user-circle {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.user-name {
+    position: absolute;
+    font-size: 18px;
+    font-weight: bold;
+    color: #ffffff;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    padding: 8px 12px;
+    background: rgba(0,0,0,0.6);
+    border-radius: 20px;
+    border: 2px solid #ffaa00;
+    transition: all 0.3s ease;
+    cursor: default;
+    user-select: none;
+}
+
+.user-name.selected {
+    background: rgba(255, 170, 0, 0.8);
+    color: #000000;
+    transform: scale(1.2);
+    box-shadow: 0 0 20px #ffaa00;
+    animation: selectedPulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes selectedPulse {
+    0% { box-shadow: 0 0 20px #ffaa00; }
+    100% { box-shadow: 0 0 30px #ffaa00, 0 0 50px #ff6b35; }
+}
+
+/* Smoke animation */
+.smoke {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: rgba(200, 200, 200, 0.7);
+    border-radius: 50%;
+    animation: smokeRise 3s linear infinite;
+    opacity: 0;
+}
+
+@keyframes smokeRise {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        opacity: 0.5;
+        transform: translateY(-100px) scale(2);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-200px) scale(3);
+    }
+}
+
+/* Directed smoke toward selected user */
+.directed-smoke {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: radial-gradient(circle, rgba(255, 170, 0, 0.8) 0%, rgba(255, 107, 53, 0.6) 50%, transparent 100%);
+    border-radius: 50%;
+    opacity: 0;
+    animation: directedSmokeMove 2s ease-out forwards;
+}
+
+@keyframes directedSmokeMove {
+    0% {
+        opacity: 1;
+        transform: scale(0.5);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.2);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(2);
+    }
+}
+
+/* Join form */
+.join-form {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    padding: 40px;
+    border-radius: 20px;
+    border: 2px solid #ffaa00;
+    box-shadow: 0 0 30px rgba(255, 170, 0, 0.3);
+    text-align: center;
+    backdrop-filter: blur(10px);
+    z-index: 100;
+}
+
+.join-form h2 {
+    margin-bottom: 20px;
+    color: #ffaa00;
+    font-size: 28px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: 2px solid #ffaa00;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    text-align: center;
+}
+
+.form-group input:focus {
+    outline: none;
+    box-shadow: 0 0 10px #ffaa00;
+}
+
+.form-group input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.form-group.interval-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+}
+
+.form-group.interval-group input {
+    width: 80px;
+}
+
+.btn {
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 5px;
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #ff6b35, #ffaa00);
+    color: #000000;
+}
+
+.btn-primary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(255, 170, 0, 0.4);
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    border: 2px solid #ffffff;
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Leave button */
+.leave-btn {
+    position: absolute;
+    bottom: 30px;
+    right: 30px;
+    padding: 10px 20px;
+    background: rgba(255, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.leave-btn:hover {
+    background: rgba(255, 0, 0, 0.9);
+    transform: scale(1.05);
+}
+
+/* Connection status */
+.connection-status {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+    z-index: 10;
+}
+
+.connected {
+    background: rgba(0, 255, 0, 0.2);
+    color: #00ff00;
+    border: 2px solid #00ff00;
+}
+
+.disconnected {
+    background: rgba(255, 0, 0, 0.2);
+    color: #ff0000;
+    border: 2px solid #ff0000;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .campfire-area {
+        width: 400px;
+        height: 400px;
+    }
+    
+    .message-display {
+        font-size: 18px;
+        top: 30px;
+    }
+    
+    .join-form {
+        width: 90%;
+        padding: 20px;
+    }
+    
+    .user-name {
+        font-size: 14px;
+        padding: 6px 10px;
+    }
+    
+    .form-group.interval-group {
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .form-group.interval-group input {
+        width: 100px;
+    }
+}
+
+@media (max-width: 480px) {
+    .campfire-area {
+        width: 350px;
+        height: 350px;
+    }
+    
+    .campfire {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .message-display {
+        font-size: 16px;
+        padding: 0 20px;
+    }
+    
+    .user-name {
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+}
