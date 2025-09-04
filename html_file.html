@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Костёр</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Stars background animation */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #ffffff;
+            border-radius: 50%;
+            animation: twinkle 3s infinite alternate;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        .container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Top message display */
+        .message-display {
+            position: absolute;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            color: #ffaa00;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+            z-index: 10;
+            max-width: 90%;
+            transition: all 0.3s ease;
+        }
+
+        /* Campfire area */
+        .campfire-area {
+            position: relative;
+            width: 600px;
+            height: 600px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Animated campfire */
+        .campfire {
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, #ff6b35 0%, #ff8e35 30%, #ffaa35 60%, #ff4500 100%);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            position: relative;
+            animation: fireFlicker 1.5s ease-in-out infinite alternate;
+            box-shadow: 0 0 50px #ff6b35, 0 0 100px #ff4500;
+        }
+
+        .campfire::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 20px;
+            width: 80px;
+            height: 100px;
+            background: radial-gradient(ellipse, #ffaa00 0%, #ff6b35 40%, transparent 70%);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            animation: fireFlicker 1.2s ease-in-out infinite alternate-reverse;
+        }
+
+        .campfire::after {
+            content: '';
+            position: absolute;
+            top: -30px;
+            left: 35px;
+            width: 50px;
+            height: 80px;
+            background: radial-gradient(ellipse, #ffff00 0%, #ffaa00 50%, transparent 80%);
+            border-radius: 50% 50% 50% 50% / 70% 70% 30% 30%;
+            animation: fireFlicker 0.8s ease-in-out infinite alternate;
+        }
+
+        @keyframes fireFlicker {
+            0% { transform: scale(1) rotate(-1deg); }
+            50% { transform: scale(1.05) rotate(0deg); }
+            100% { transform: scale(0.95) rotate(1deg); }
+        }
+
+        /* Wood logs under fire */
+        .wood-logs {
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 140px;
+            height: 20px;
+        }
+
+        .log {
+            position: absolute;
+            width: 80px;
+            height: 12px;
+            background: linear-gradient(45deg, #8B4513, #A0522D);
+            border-radius: 6px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .log:nth-child(1) {
+            transform: rotate(25deg);
+            left: 10px;
+        }
+
+        .log:nth-child(2) {
+            transform: rotate(-25deg);
+            right: 10px;
+        }
+
+        .log:nth-child(3) {
+            transform: rotate(0deg);
+            left: 50%;
+            transform: translateX(-50%);
+            top: 8px;
+        }
+
+        /* User names around campfire */
+        .user-circle {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .user-name {
+            position: absolute;
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffffff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            padding: 8px 12px;
+            background: rgba(0,0,0,0.6);
+            border-radius: 20px;
+            border: 2px solid #ffaa00;
+            transition: all 0.3s ease;
+            cursor: default;
+            user-select: none;
+        }
+
+        .user-name.selected {
+            background: rgba(255, 170, 0, 0.8);
+            color: #000000;
+            transform: scale(1.2);
+            box-shadow: 0 0 20px #ffaa00;
+            animation: selectedPulse 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes selectedPulse {
+            0% { box-shadow: 0 0 20px #ffaa00; }
+            100% { box-shadow: 0 0 30px #ffaa00, 0 0 50px #ff6b35; }
+        }
+
+        /* Smoke animation */
+        .smoke {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(200, 200, 200, 0.7);
+            border-radius: 50%;
+            animation: smokeRise 3s linear infinite;
+            opacity: 0;
+        }
+
+        @keyframes smokeRise {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: translateY(-100px) scale(2);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-200px) scale(3);
+            }
+        }
+
+        /* Directed smoke toward selected user */
+        .directed-smoke {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: radial-gradient(circle, rgba(255, 170, 0, 0.8) 0%, rgba(255, 107, 53, 0.6) 50%, transparent 100%);
+            border-radius: 50%;
+            opacity: 0;
+            animation: directedSmokeMove 2s ease-out forwards;
+        }
+
+        @keyframes directedSmokeMove {
+            0% {
+                opacity: 1;
+                transform: scale(0.5);
+            }
+            50% {
+                opacity: 0.8;
+                transform: scale(1.2);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(2);
+            }
+        }
+
+        /* Join form */
+        .join-form {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 40px;
+            border-radius: 20px;
+            border: 2px solid #ffaa00;
+            box-shadow: 0 0 30px rgba(255, 170, 0, 0.3);
+            text-align: center;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+
+        .join-form h2 {
+            margin-bottom: 20px;
+            color: #ffaa00;
+            font-size: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ffaa00;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            text-align: center;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            box-shadow: 0 0 10px #ffaa00;
+        }
+
+        .form-group.interval-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .form-group.interval-group input {
+            width: 80px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #ff6b35, #ffaa00);
+            color: #000000;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255, 170, 0, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            border: 2px solid #ffffff;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Leave button */
+        .leave-btn {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            padding: 10px 20px;
+            background: rgba(255, 0, 0, 0.7);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .leave-btn:hover {
+            background: rgba(255, 0, 0, 0.9);
+            transform: scale(1.05);
+        }
+
+        /* Connection status */
+        .connection-status {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            z-index: 10;
+        }
+
+        .connected {
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+            border: 2px solid #00ff00;
+        }
+
+        .disconnected {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff0000;
+            border: 2px solid #ff0000;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .campfire-area {
+                width: 400px;
+                height: 400px;
+            }
+            
+            .message-display {
+                font-size: 18px;
+                top: 30px;
+            }
+            
+            .join-form {
+                width: 90%;
+                padding: 20px;
+            }
+            
+            .user-name {
+                font-size: 14px;
+                padding: 6px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Stars background -->
+    <div class="stars" id="stars"></div>
+    
+    <!-- Connection status -->
+    <div class="connection-status disconnected" id="connectionStatus">
+        Подключение...
+    </div>
+    
+    <!-- Top message display -->
+    <div class="message-display" id="messageDisplay">
+        Добро пожаловать к костру!
+    </div>
+    
+    <!-- Main container -->
+    <div class="container">
+        <!-- Join form (shown initially) -->
+        <div class="join-form" id="joinForm">
+            <h2>🔥 Присоединиться к костру</h2>
+            <div class="form-group">
+                <label for="userName">Ваше имя:</label>
+                <input type="text" id="userName" placeholder="Введите ваше имя..." maxlength="20">
+            </div>
+            <div class="form-group" id="intervalSettings">
+                <label>Интервал выбора (первый пользователь устанавливает):</label>
+                <div class="interval-group">
+                    <input type="number" id="intervalMin" placeholder="5" min="3" max="30" value="5">
+                    <span>—</span>
+                    <input type="number" id="intervalMax" placeholder="10" min="3" max="30" value="10">
+                    <span>секунд</span>
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="joinCampfire()">Присоединиться</button>
+        </div>
+        
+        <!-- Campfire area (hidden initially) -->
+        <div class="campfire-area" id="campfireArea" style="display: none;">
+            <!-- User names circle -->
+            <div class="user-circle" id="userCircle"></div>
+            
+            <!-- Animated campfire -->
+            <div class="campfire">
+                <div class="wood-logs">
+                    <div class="log"></div>
+                    <div class="log"></div>
+                    <div class="log"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Leave button (hidden initially) -->
+    <button class="leave-btn" id="leaveBtn" onclick="leaveCampfire()" style="display: none;">
+        Покинуть костёр
+    </button>
+
+    <!-- Socket.io client -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        // Global variables
+        let socket = null;
+        let currentUser = null;
+        let users = [];
+        let isFirstUser = false;
+        
+        // DOM elements
+        const joinForm = document.getElementById('joinForm');
+        const campfireArea = document.getElementById('campfireArea');
+        const messageDisplay = document.getElementById('messageDisplay');
+        const userCircle = document.getElementById('userCircle');
+        const connectionStatus = document.getElementById('connectionStatus');
+        const leaveBtn = document.getElementById('leaveBtn');
+        const intervalSettings = document.getElementById('intervalSettings');
+        
+        // Initialize stars background
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+        
+        // Generate ambient smoke particles
+        function createAmbientSmoke() {
+            const campfire = document.querySelector('.campfire');
+            
+            setInterval(() => {
+                const smoke = document.createElement('div');
+                smoke.className = 'smoke';
+                smoke.style.left = (campfire.offsetWidth / 2 - 2) + 'px';
+                smoke.style.top = '0px';
+                smoke.style.left = (campfire.offsetWidth / 2 - 2 + (Math.random() - 0.5) * 40) + 'px';
+                smoke.style.animationDelay = Math.random() * 0.5 + 's';
+                
+                campfire.appendChild(smoke);
+                
+                // Remove smoke element after animation
+                setTimeout(() => {
+                    if (smoke.parentNode) {
+                        smoke.parentNode.removeChild(smoke);
+                    }
+                }, 3000);
+            }, 200);
+        }
+        
+        // Create directed smoke animation toward selected user
+        function createDirectedSmoke(targetPosition) {
+            const campfireRect = document.querySelector('.campfire').getBoundingClientRect();
+            const campfireAreaRect = document.querySelector('.campfire-area').getBoundingClientRect();
+            
+            // Calculate relative positions
+            const startX = campfireRect.left - campfireAreaRect.left + campfireRect.width / 2;
+            const startY = campfireRect.top - campfireAreaRect.top + campfireRect.height / 2;
+            
+            const endX = targetPosition.x + 300; // 300 is half of campfire-area width
+            const endY = targetPosition.y + 300; // 300 is half of campfire-area height
+            
+            // Create multiple smoke particles
+            for (let i = 0; i < 8; i++) {
+                setTimeout(() => {
+                    const smoke = document.createElement('div');
+                    smoke.className = 'directed-smoke';
+                    smoke.style.left = startX + 'px';
+                    smoke.style.top = startY + 'px';
+                    
+                    // Calculate movement
+                    const deltaX = endX - startX;
+                    const deltaY = endY - startY;
+                    
+                    // Apply the movement with CSS transforms
+                    smoke.style.setProperty('--deltaX', deltaX + 'px');
+                    smoke.style.setProperty('--deltaY', deltaY + 'px');
+                    
+                    // Add custom animation
+                    smoke.style.animation = `directedSmokeMove 2s ease-out forwards`;
+                    smoke.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+                    
+                    campfireArea.appendChild(smoke);
+                    
+                    // Remove after animation
+                    setTimeout(() => {
+                        if (smoke.parentNode) {
+                            smoke.parentNode.removeChild(smoke);
+                        }
+                    }, 2000);
+                }, i * 100);
+            }
+        }
+        
+        // Initialize socket connection
+        function initSocket() {
+            socket = io();
+            
+            socket.on('connect', () => {
+                console.log('Connected to server');
+                connectionStatus.textContent = 'Подключено';
+                connectionStatus.className = 'connection-status connected';
+            });
+            
+            socket.on('disconnect', () => {
+                console.log('Disconnected from server');
+                connectionStatus.textContent = 'Отключено';
+                connectionStatus.className = 'connection-status disconnected';
+            });
+            
+            socket.on('currentState', (state) => {
+                users = state.users;
+                if (state.currentSelection) {
+                    updateMessageDisplay(state.currentSelection.name);
+                    if (state.currentSelection.position) {
+                        highlightUser(state.currentSelection.name);
+                    }
+                }
+                updateUserDisplay();
+            });
+            
+            socket.on('usersUpdated', (updatedUsers) => {
+                users = updatedUsers;
+                updateUserDisplay();
+            });
+            
+            socket.on('userSelected', (selection) => {
+                updateMessageDisplay(selection.name);
+                highlightUser(selection.name);
+                
+                // Create directed smoke if user has position
+                if (selection.position && !selection.isDefault) {
+                    createDirectedSmoke(selection.position);
+                }
+            });
+        }
+        
+        // Join campfire function
+        function joinCampfire() {
+            const nameInput = document.getElementById('userName');
+            const name = nameInput.value.trim();
+            
+            if (!name) {
+                alert('Пожалуйста, введите ваше имя!');
+                return;
+            }
+            
+            if (name.length > 20) {
+                alert('Имя не должно превышать 20 символов!');
+                return;
+            }
+            
+            currentUser = name;
+            
+            // Get interval settings if this might be the first user
+            const intervalMin = parseInt(document.getElementById('intervalMin').value) || 5;
+            const intervalMax = parseInt(document.getElementById('intervalMax').value) || 10;
+            
+            // Validate intervals
+            if (intervalMin > intervalMax) {
+                alert('Минимальный интервал не может быть больше максимального!');
+                return;
+            }
+            
+            // Send join request
+            socket.emit('joinCampfire', {
+                name: name,
+                intervalMin: intervalMin,
+                intervalMax: intervalMax
+            });
+            
+            // Hide form and show campfire
+            joinForm.style.display = 'none';
+            campfireArea.style.display = 'block';
+            leaveBtn.style.display = 'block';
+            
+            // Start ambient smoke
+            createAmbientSmoke();
+        }
+        
+        // Leave campfire function
+        function leaveCampfire() {
+            if (confirm('Вы уверены, что хотите покинуть костёр?')) {
+                socket.emit('leaveCampfire');
+                resetToJoinForm();
+            }
+        }
+        
+        // Reset to join form
+        function resetToJoinForm() {
+            currentUser = null;
+            users = [];
+            joinForm.style.display = 'block';
+            campfireArea.style.display = 'none';
+            leaveBtn.style.display = 'none';
+            messageDisplay.textContent = 'Добро пожаловать к костру!';
+            userCircle.innerHTML = '';
+        }
+        
+        // Update user display around campfire
+        function updateUserDisplay() {
+            userCircle.innerHTML = '';
+            
+            users.forEach(user => {
+                const userElement = document.createElement('div');
+                userElement.className = 'user-name';
+                userElement.textContent = user.name;
+                userElement.id = `user-${user.name}`;
+                
+                // Position around campfire
+                const centerX = 300; // Half of campfire-area width
+                const center
